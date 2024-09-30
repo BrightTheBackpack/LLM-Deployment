@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Form</title>
+</head>
+<body>
+    <form id="predictionForm">
+        <label for="textInput">Input:</label>
+        <input type="text" id="textInput" name="textInput"><br><br>
+
+        <label for="numberInput">Max Tokens:</label>
+        <input type="number" id="numberInput" name="numberInput"><br><br>
+
+        <button type="button" onclick = "makePrediction()">Run</button>
+    </form>
+    <div id="result"></div>
+    <script>
+     function makePrediction() {
+    // Get the text and number inputs
+    const text = document.getElementById("textInput").value;
+    const number = document.getElementById("numberInput").value;
+
+    // Prepare the data to be sent to the Flask backend
+    const data = {
+        text: text,
+        number: Number(number)  // Convert to number
+    };
+
+    // Send a POST request to the Flask API
+    fetch('/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())  // Parse the JSON response
+    .then(result => {
+        // Display the result in the 'result' div
+        const formattedText = result.predicted_class.replace(/\n/g, '<br>');
+        console.log(formattedText)
+        document.getElementById('result').innerHTML = 
+            `Predicted class:<br> ${formattedText}`;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = 
+            `Error: ${error.message}`;
+    });
+}
+
+    </script>
+
+</body>
+</html>
